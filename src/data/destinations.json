@@ -1,0 +1,17 @@
+{
+  "fx": { "INR": 1, "USD": 0.012, "EUR": 0.011, "GBP": 0.0094, "AED": 0.044, "SGD": 0.016, "THB": 0.42 },
+  "destinations": [
+    { "name": "Goa", "country": "India", "iata": "GOI", "flight": 6500, "stay": 3500, "extraBed": 1000, "cab": 2500, "breakfast": 300, "lunch": 450, "dinner": 700, "places": 300, "activities": 1800 },
+    { "name": "Manali", "country": "India", "iata": "KUU", "flight": 7500, "stay": 3000, "extraBed": 900, "cab": 3200, "breakfast": 250, "lunch": 400, "dinner": 600, "places": 200, "activities": 2000 },
+    { "name": "Jaipur", "country": "India", "iata": "JAI", "flight": 5500, "stay": 3200, "extraBed": 900, "cab": 2200, "breakfast": 250, "lunch": 400, "dinner": 600, "places": 500, "activities": 1500 },
+    { "name": "Kerala", "country": "India", "iata": "COK", "flight": 6000, "stay": 3800, "extraBed": 1100, "cab": 2800, "breakfast": 250, "lunch": 400, "dinner": 600, "places": 300, "activities": 2200 },
+    { "name": "Ladakh", "country": "India", "iata": "IXL", "flight": 9500, "stay": 3500, "extraBed": 1000, "cab": 5500, "breakfast": 300, "lunch": 450, "dinner": 650, "places": 250, "activities": 2500 },
+    { "name": "Andaman", "country": "India", "iata": "IXZ", "flight": 11000, "stay": 5000, "extraBed": 1500, "cab": 2500, "breakfast": 350, "lunch": 500, "dinner": 750, "places": 400, "activities": 3000 },
+    { "name": "Dubai", "country": "UAE", "iata": "DXB", "flight": 22000, "stay": 9000, "extraBed": 2500, "cab": 6000, "breakfast": 800, "lunch": 1200, "dinner": 1800, "places": 3500, "activities": 5500 },
+    { "name": "Bangkok", "country": "Thailand", "iata": "BKK", "flight": 17000, "stay": 4500, "extraBed": 1200, "cab": 3500, "breakfast": 400, "lunch": 600, "dinner": 900, "places": 1200, "activities": 3500 },
+    { "name": "Singapore", "country": "Singapore", "iata": "SIN", "flight": 24000, "stay": 12000, "extraBed": 3000, "cab": 5500, "breakfast": 900, "lunch": 1200, "dinner": 1800, "places": 3000, "activities": 5000 },
+    { "name": "Bali", "country": "Indonesia", "iata": "DPS", "flight": 28000, "stay": 5500, "extraBed": 1500, "cab": 3800, "breakfast": 450, "lunch": 700, "dinner": 1100, "places": 900, "activities": 3800 },
+    { "name": "Paris", "country": "France", "iata": "CDG", "flight": 55000, "stay": 15000, "extraBed": 4000, "cab": 9000, "breakfast": 1200, "lunch": 1800, "dinner": 2800, "places": 2500, "activities": 5500 },
+    { "name": "London", "country": "United Kingdom", "iata": "LHR", "flight": 58000, "stay": 16000, "extraBed": 4500, "cab": 9500, "breakfast": 1300, "lunch": 1800, "dinner": 3000, "places": 2500, "activities": 5500 }
+  ]
+}

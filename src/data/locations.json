@@ -1,0 +1,517 @@
+{
+ "locations": [
+  {
+   "name": "Delhi",
+   "country": "India",
+   "iata": "DEL",
+   "note": "New Delhi"
+  },
+  {
+   "name": "Mumbai",
+   "country": "India",
+   "iata": "BOM",
+   "note": "Bombay"
+  },
+  {
+   "name": "Bengaluru",
+   "country": "India",
+   "iata": "BLR",
+   "note": "Bangalore"
+  },
+  {
+   "name": "Chennai",
+   "country": "India",
+   "iata": "MAA",
+   "note": "Madras"
+  },
+  {
+   "name": "Kolkata",
+   "country": "India",
+   "iata": "CCU",
+   "note": "Calcutta"
+  },
+  {
+   "name": "Hyderabad",
+   "country": "India",
+   "iata": "HYD"
+  },
+  {
+   "name": "Pune",
+   "country": "India",
+   "iata": "PNQ",
+   "note": "Poona"
+  },
+  {
+   "name": "Ahmedabad",
+   "country": "India",
+   "iata": "AMD"
+  },
+  {
+   "name": "Goa",
+   "country": "India",
+   "iata": "GOI",
+   "note": "Dabolim airport"
+  },
+  {
+   "name": "Jaipur",
+   "country": "India",
+   "iata": "JAI"
+  },
+  {
+   "name": "Manali",
+   "country": "India",
+   "iata": "KUU",
+   "note": "Kullu-Manali airport"
+  },
+  {
+   "name": "Kerala",
+   "country": "India",
+   "iata": "COK",
+   "note": "Kochi airport"
+  },
+  {
+   "name": "Ladakh",
+   "country": "India",
+   "iata": "IXL",
+   "note": "Leh airport"
+  },
+  {
+   "name": "Andaman",
+   "country": "India",
+   "iata": "IXZ",
+   "note": "Port Blair airport"
+  },
+  {
+   "name": "Kochi",
+   "country": "India",
+   "iata": "COK",
+   "note": "Cochin"
+  },
+  {
+   "name": "Thiruvananthapuram",
+   "country": "India",
+   "iata": "TRV",
+   "note": "Trivandrum"
+  },
+  {
+   "name": "Srinagar",
+   "country": "India",
+   "iata": "SXR",
+   "note": "Kashmir"
+  },
+  {
+   "name": "Udaipur",
+   "country": "India",
+   "iata": "UDR"
+  },
+  {
+   "name": "Varanasi",
+   "country": "India",
+   "iata": "VNS",
+   "note": "Benares"
+  },
+  {
+   "name": "Amritsar",
+   "country": "India",
+   "iata": "ATQ"
+  },
+  {
+   "name": "Lucknow",
+   "country": "India",
+   "iata": "LKO"
+  },
+  {
+   "name": "Chandigarh",
+   "country": "India",
+   "iata": "IXC"
+  },
+  {
+   "name": "Coimbatore",
+   "country": "India",
+   "iata": "CJB"
+  },
+  {
+   "name": "Madurai",
+   "country": "India",
+   "iata": "IXM"
+  },
+  {
+   "name": "Visakhapatnam",
+   "country": "India",
+   "iata": "VTZ",
+   "note": "Vizag"
+  },
+  {
+   "name": "Bhubaneswar",
+   "country": "India",
+   "iata": "BBI"
+  },
+  {
+   "name": "Guwahati",
+   "country": "India",
+   "iata": "GAU"
+  },
+  {
+   "name": "Indore",
+   "country": "India",
+   "iata": "IDR"
+  },
+  {
+   "name": "Nagpur",
+   "country": "India",
+   "iata": "NAG"
+  },
+  {
+   "name": "Dehradun",
+   "country": "India",
+   "iata": "DED",
+   "note": "Gateway to Mussoorie and Rishikesh"
+  },
+  {
+   "name": "Bagdogra",
+   "country": "India",
+   "iata": "IXB",
+   "note": "Gateway to Darjeeling and Sikkim"
+  },
+  {
+   "name": "Mangaluru",
+   "country": "India",
+   "iata": "IXE",
+   "note": "Mangalore"
+  },
+  {
+   "name": "Mysuru",
+   "country": "India",
+   "iata": "MYQ",
+   "note": "Mysore"
+  },
+  {
+   "name": "Ranchi",
+   "country": "India",
+   "iata": "IXR"
+  },
+  {
+   "name": "Patna",
+   "country": "India",
+   "iata": "PAT"
+  },
+  {
+   "name": "Dubai",
+   "country": "United Arab Emirates",
+   "iata": "DXB"
+  },
+  {
+   "name": "Abu Dhabi",
+   "country": "United Arab Emirates",
+   "iata": "AUH"
+  },
+  {
+   "name": "Doha",
+   "country": "Qatar",
+   "iata": "DOH"
+  },
+  {
+   "name": "Bangkok",
+   "country": "Thailand",
+   "iata": "BKK"
+  },
+  {
+   "name": "Phuket",
+   "country": "Thailand",
+   "iata": "HKT"
+  },
+  {
+   "name": "Singapore",
+   "country": "Singapore",
+   "iata": "SIN"
+  },
+  {
+   "name": "Bali",
+   "country": "Indonesia",
+   "iata": "DPS",
+   "note": "Denpasar"
+  },
+  {
+   "name": "Kuala Lumpur",
+   "country": "Malaysia",
+   "iata": "KUL"
+  },
+  {
+   "name": "Colombo",
+   "country": "Sri Lanka",
+   "iata": "CMB"
+  },
+  {
+   "name": "Kathmandu",
+   "country": "Nepal",
+   "iata": "KTM"
+  },
+  {
+   "name": "Male",
+   "country": "Maldives",
+   "iata": "MLE"
+  },
+  {
+   "name": "Hong Kong",
+   "country": "Hong Kong",
+   "iata": "HKG"
+  },
+  {
+   "name": "Tokyo",
+   "country": "Japan",
+   "iata": "HND"
+  },
+  {
+   "name": "Osaka",
+   "country": "Japan",
+   "iata": "KIX"
+  },
+  {
+   "name": "Seoul",
+   "country": "South Korea",
+   "iata": "ICN"
+  },
+  {
+   "name": "Sydney",
+   "country": "Australia",
+   "iata": "SYD"
+  },
+  {
+   "name": "Melbourne",
+   "country": "Australia",
+   "iata": "MEL"
+  },
+  {
+   "name": "Paris",
+   "country": "France",
+   "iata": "CDG"
+  },
+  {
+   "name": "London",
+   "country": "United Kingdom",
+   "iata": "LHR"
+  },
+  {
+   "name": "Rome",
+   "country": "Italy",
+   "iata": "FCO"
+  },
+  {
+   "name": "Barcelona",
+   "country": "Spain",
+   "iata": "BCN"
+  },
+  {
+   "name": "Amsterdam",
+   "country": "Netherlands",
+   "iata": "AMS"
+  },
+  {
+   "name": "Frankfurt",
+   "country": "Germany",
+   "iata": "FRA"
+  },
+  {
+   "name": "Zurich",
+   "country": "Switzerland",
+   "iata": "ZRH"
+  },
+  {
+   "name": "Istanbul",
+   "country": "Turkey",
+   "iata": "IST"
+  },
+  {
+   "name": "New York",
+   "country": "United States",
+   "iata": "JFK",
+   "note": "NYC"
+  },
+  {
+   "name": "Los Angeles",
+   "country": "United States",
+   "iata": "LAX",
+   "note": "LA"
+  },
+  {
+   "name": "San Francisco",
+   "country": "United States",
+   "iata": "SFO"
+  },
+  {
+   "name": "Toronto",
+   "country": "Canada",
+   "iata": "YYZ"
+  },
+  {
+   "name": "Chicago",
+   "country": "United States",
+   "iata": "ORD"
+  },
+  {
+   "name": "Washington DC",
+   "country": "United States",
+   "iata": "IAD",
+   "note": "Dulles airport"
+  },
+  {
+   "name": "Miami",
+   "country": "United States",
+   "iata": "MIA"
+  },
+  {
+   "name": "Las Vegas",
+   "country": "United States",
+   "iata": "LAS"
+  },
+  {
+   "name": "Seattle",
+   "country": "United States",
+   "iata": "SEA"
+  },
+  {
+   "name": "Boston",
+   "country": "United States",
+   "iata": "BOS"
+  },
+  {
+   "name": "Orlando",
+   "country": "United States",
+   "iata": "MCO"
+  },
+  {
+   "name": "Honolulu",
+   "country": "United States",
+   "iata": "HNL"
+  },
+  {
+   "name": "Atlanta",
+   "country": "United States",
+   "iata": "ATL"
+  },
+  {
+   "name": "Dallas",
+   "country": "United States",
+   "iata": "DFW"
+  },
+  {
+   "name": "Vancouver",
+   "country": "Canada",
+   "iata": "YVR"
+  },
+  {
+   "name": "Cairo",
+   "country": "Egypt",
+   "iata": "CAI"
+  },
+  {
+   "name": "Cape Town",
+   "country": "South Africa",
+   "iata": "CPT"
+  },
+  {
+   "name": "Nairobi",
+   "country": "Kenya",
+   "iata": "NBO"
+  },
+  {
+   "name": "Mexico City",
+   "country": "Mexico",
+   "iata": "MEX",
+   "note": "Ciudad de Mexico"
+  },
+  {
+   "name": "Sao Paulo",
+   "country": "Brazil",
+   "iata": "GRU",
+   "note": "Guarulhos airport"
+  },
+  {
+   "name": "Auckland",
+   "country": "New Zealand",
+   "iata": "AKL"
+  },
+  {
+   "name": "Vienna",
+   "country": "Austria",
+   "iata": "VIE"
+  },
+  {
+   "name": "Prague",
+   "country": "Czechia",
+   "iata": "PRG"
+  },
+  {
+   "name": "Athens",
+   "country": "Greece",
+   "iata": "ATH"
+  },
+  {
+   "name": "Lisbon",
+   "country": "Portugal",
+   "iata": "LIS"
+  },
+  {
+   "name": "Madrid",
+   "country": "Spain",
+   "iata": "MAD"
+  },
+  {
+   "name": "Munich",
+   "country": "Germany",
+   "iata": "MUC"
+  },
+  {
+   "name": "Milan",
+   "country": "Italy",
+   "iata": "MXP",
+   "note": "Malpensa airport"
+  },
+  {
+   "name": "Venice",
+   "country": "Italy",
+   "iata": "VCE"
+  },
+  {
+   "name": "Dublin",
+   "country": "Ireland",
+   "iata": "DUB"
+  },
+  {
+   "name": "Hanoi",
+   "country": "Vietnam",
+   "iata": "HAN"
+  },
+  {
+   "name": "Ho Chi Minh City",
+   "country": "Vietnam",
+   "iata": "SGN",
+   "note": "Saigon"
+  },
+  {
+   "name": "Manila",
+   "country": "Philippines",
+   "iata": "MNL"
+  },
+  {
+   "name": "Jakarta",
+   "country": "Indonesia",
+   "iata": "CGK"
+  },
+  {
+   "name": "Beijing",
+   "country": "China",
+   "iata": "PEK"
+  },
+  {
+   "name": "Shanghai",
+   "country": "China",
+   "iata": "PVG"
+  },
+  {
+   "name": "Taipei",
+   "country": "Taiwan",
+   "iata": "TPE"
+  }
+ ]
+}

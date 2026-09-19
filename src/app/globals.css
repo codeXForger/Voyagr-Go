@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --color-mist: #edf2f4;
+  --color-ink: #16323b;
+  --color-muted: #5c7480;
+  --color-line: #d9e2e6;
+  --color-sea-50: #eef8fa;
+  --color-sea-100: #ddf0f3;
+  --color-sea-500: #1b8a9c;
+  --color-sea-700: #0f6172;
+  --color-sea-900: #0c3b47;
+  --color-saffron-100: #fdf0da;
+  --color-saffron-500: #f0a030;
+  --color-saffron-700: #a8650a;
+}
+
+body { background: var(--color-mist); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+.num { font-variant-numeric: tabular-nums; }
+.display { font-family: var(--font-display); letter-spacing: -0.02em; }
+
+@layer components {
+/* Inputs */
+.field { @apply h-10 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink placeholder:text-muted/60 transition-colors hover:border-sea-500/50; }
+.field:focus-visible, .ghost:focus-visible { @apply outline-2 outline-offset-1 outline-sea-500 border-sea-500; }
+.ghost { @apply w-full rounded-md border border-transparent bg-transparent px-2 py-1 text-sm transition-colors hover:border-line focus:bg-white; }
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* Buttons */
+.btn { @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-line bg-white px-3.5 text-sm font-medium text-ink transition-colors hover:bg-sea-50 disabled:cursor-not-allowed disabled:opacity-50; }
+.btn:focus-visible, .icon-btn:focus-visible, .tab:focus-visible { @apply outline-2 outline-offset-2 outline-sea-500; }
+.btn-primary { @apply border-sea-700 bg-sea-700 text-white hover:bg-sea-900; }
+.icon-btn { @apply inline-flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-sea-100 hover:text-sea-900; }
+
+.panel { @apply rounded-2xl border border-line bg-white; }
+.tab { @apply relative px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:text-ink; }
+.tab[aria-selected="true"] { @apply text-sea-900; }
+.tab[aria-selected="true"]::after { content: ""; @apply absolute inset-x-3 -bottom-px h-0.5 rounded bg-sea-700; }
+
+}
+
+/* Boarding-pass ticket: perforation notches */
+.ticket { --notch: 12px; background:
+  radial-gradient(circle at var(--stub-x, 70.4%) 0, var(--color-mist) var(--notch), transparent calc(var(--notch) + 0.5px)) top / 100% 51% no-repeat,
+  radial-gradient(circle at var(--stub-x, 70.4%) 100%, var(--color-mist) var(--notch), transparent calc(var(--notch) + 0.5px)) bottom / 100% 51% no-repeat,
+  var(--color-sea-900); }
+.perforation { border-left: 2px dashed rgb(255 255 255 / 0.22); }
+
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.toast { animation: toast-in 0.18s ease-out; }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } * { transition: none !important; } }
