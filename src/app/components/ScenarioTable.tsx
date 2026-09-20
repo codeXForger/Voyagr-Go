@@ -17,7 +17,7 @@ export function ScenarioTable() {
       <div className="flex flex-wrap items-center gap-3 px-4 py-3">
         <div>
           <h2 className="display text-lg font-semibold">What if a different number of people travel?</h2>
-          <p className="text-sm text-muted">Rooms and cabs adjust to the number of travelers. Your current plan is highlighted.</p>
+          <p className="text-sm text-muted">Rooms adjust to the number of travelers, and so do costs billed per person. A price for the whole group (like a cab) stays as you entered it. Your current plan is highlighted.</p>
         </div>
         <label className="ml-auto flex items-center gap-2 text-sm text-muted">Compare up to
           <div className="w-32"><NumField stepper label="Max people" min={1} value={max} onChange={setMax} /></div>

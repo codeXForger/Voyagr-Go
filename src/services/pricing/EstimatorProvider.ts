@@ -2,7 +2,8 @@ import type { CategoryId } from "@/domain/types";
 import { convertFromInr, findDestination } from "./destinations";
 import type { PriceProvider, PriceQuery, PriceQuote } from "./PriceProvider";
 
-const CATEGORY_KEYS: CategoryId[] = [
+/** Categories with built-in rates. Transfers, parking, places and activities are priced by the user in the itinerary. */
+const CATEGORY_KEYS: Exclude<CategoryId, "transfers" | "parking">[] = [
   "flight", "stay", "extraBed", "cab", "breakfast", "lunch", "dinner", "places", "activities",
 ];
 /** Fallback rates (INR) for destinations missing from the catalog. */

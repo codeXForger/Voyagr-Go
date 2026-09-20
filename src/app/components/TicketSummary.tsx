@@ -2,6 +2,7 @@
 import { formatRange } from "@/domain/dates";
 import { formatMoney } from "@/domain/format";
 import { toIata } from "@/domain/locations";
+import { maxRooms } from "@/domain/stays";
 import { summarize } from "@/domain/pricing";
 import { useTripStore } from "@/store/tripStore";
 import { useLocationsReady } from "../useLocationsReady";
@@ -25,7 +26,7 @@ export function TicketSummary() {
     ...(range ? [range] : []),
     `${c.days} ${c.days === 1 ? "day" : "days"}, ${c.nights} ${c.nights === 1 ? "night" : "nights"}`,
     `${c.people} ${c.people === 1 ? "traveler" : "travelers"}`,
-    `${c.rooms} ${c.rooms === 1 ? "room" : "rooms"}${c.extraBeds ? ` + ${c.extraBeds} extra ${c.extraBeds === 1 ? "bed" : "beds"}` : ""}`,
+    ...(trip.stays.length ? [`${trip.stays.length} ${trip.stays.length === 1 ? "hotel" : "hotels"}, up to ${maxRooms(trip.stays, c)} ${maxRooms(trip.stays, c) === 1 ? "room" : "rooms"}`] : [])
   ];
 
   return (

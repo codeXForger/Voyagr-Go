@@ -10,19 +10,26 @@ There is **no database and no account**. Your trips live in your browser and in 
 
 - **Route and dates**: searchable From and To dropdowns (about 4,000 airports, plus states, countries and airport
   codes, so "california" or "chicago" both work) and From/To date pickers linked to days and nights.
-- **Travelers**: number of people, rooms and extra beds.
-- **Daily charges**: hotel room, extra bed, breakfast, lunch, dinner and cab, all charged per day or night, with a per-day
-  and per-person-per-day summary.
-- **Trip charges**: flights, plus places and activities from your itinerary.
+- **Travelers**: number of people.
+- **Hotels**: add each place you stay and the nights you spend there, and add another when you move on (two nights at one
+  hotel, then a new one). For each hotel enter the price per room per night, people per room, rooms (automatic by default)
+  and extra beds with their price. A night strip shows which hotel covers which night and flags nights with none.
+- **Daily charges**: your hotels and extra beds (from the itinerary), plus breakfast, lunch and dinner, all charged per day or
+  night, with a per-day and per-person-per-day summary.
+- **Trip charges**: entry fees, activities and transfers from your itinerary. Add flights as a "Flight" transfer.
 - **Itinerary**: add places for each day and the activities at each place, one per row, and drag rows to reorder.
-  Each place has an entry fee, each activity a price, both per person, for the number of people who take part
-  (defaults: everyone, fee 0, activity price 500). They appear in the cost list automatically and are removed
-  from it when you remove them from the itinerary.
+  Add **transfers** between stops (cab, auto, bus, train, ferry, flight, walk), each with its own cost, either one
+  price for the group (a cab) or per person (a ferry). Each place has an entry fee and an optional parking charge (one price for the group, 0 by default), and each activity a price, per person,
+  for the number of people who take part (defaults: everyone, fee 0, activity price 500). Times are optional.
+  Everything appears in the cost list automatically and is removed from it when you remove it from the itinerary.
+- **Timeline**: switch the itinerary to a read-only timeline that shows each day in order, with stops, activities,
+  the transfers between them, optional times and the day's cost.
 - **Editable prices** everywhere, showing unit price, per person and total. Edited prices are kept when you refresh estimates.
-- **"If N people go"**: totals for 1 to N travelers, with rooms and cabs adjusting to the group size.
-- **Estimates**: approximate flight, stay, food and cab prices for popular destinations, offline. Optionally live
+- **"If N people go"**: totals for 1 to N travelers, with hotel rooms (when set to automatic) and per-person costs adjusting to the group size.
+- **Estimates**: approximate stay and food prices for popular destinations, offline. Optionally live
   flights and hotels from Amadeus.
-- **PDF export** of the itinerary, costs and group-size table.
+- **PDF export**: a branded, multi-page document with a cover (route, dates, per-person and total price), a cost split chart, your
+  hotels, a day-by-day timeline with transfers, activities and hotel check-ins, full cost tables and the group-size table.
 - **Save and open**: a JSON file on your device, or Google Drive (in a `Voyagr-Go` folder).
 
 ## Quick start
@@ -81,7 +88,7 @@ environment, which has limited data, so treat results as rough. When Amadeus has
 - **Prices are approximate.** The built-in estimates cover about a dozen destinations (see `src/data/destinations.json`)
   and anywhere else gets generic figures. Always check and edit prices before you rely on them.
 - **Unsaved work is lost on refresh.** There is no server storage, so save your trip to a file or Google Drive.
-- Places and activities in costs are managed from the Itinerary tab. The lock icon on those rows means "edit it there".
+- Hotels, entry fees, activities and transfers in costs are managed from the Itinerary tab. The lock icon on those rows means "edit it there".
 
 ## Development
 
@@ -108,7 +115,7 @@ src/services/   price providers, storage (file, Google Drive), PDF export
 src/store/      Zustand store
 src/app/        UI components and the /api/prices route
 src/data/       destination rates and place lists
-scripts/        build-airports.mjs regenerates the airport list
+scripts/        build-airports.mjs and build-icons.mjs regenerate generated data
 ```
 
 ## Contributing

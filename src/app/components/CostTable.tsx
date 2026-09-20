@@ -12,7 +12,7 @@ import { NumField } from "./NumField";
 const COLS = "md:grid-cols-[minmax(0,2.2fr)_9rem_minmax(0,1fr)_minmax(0,1fr)_2rem]";
 
 export function CostTable({ onOpenItinerary }: { onOpenItinerary?: () => void }) {
-  const { trip, updateItem, addItem, removeItem, setLinkedPrice } = useTripStore();
+  const { trip, updateItem, addItem, removeItem, setLinkedPrice, setStayPrice } = useTripStore();
   const { days, people, currency } = trip.config;
   const money = (n: number) => formatMoney(n, currency);
   const summary = summarize(trip);
@@ -23,23 +23,24 @@ export function CostTable({ onOpenItinerary }: { onOpenItinerary?: () => void })
   const renderRow = (l: LineCost) => {
     const cat = getCategory(l.item.category);
     const link = l.item.link;
-    const people = `${l.quantity} ${l.quantity === 1 ? "person" : "people"}`;
+    const stay = l.item.stay;
+    const managed = Boolean(link || stay); // derived from the itinerary: locked here
     return (
       <li key={l.item.id} data-testid={`row-${l.item.category}`} className={`grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-3 ${COLS}`}>
         <div className="flex min-w-0 items-center gap-3">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-white" style={{ background: CATEGORY_COLOR[l.item.category] }} title={cat.label}>
-            <IconBadge name={cat.icon} className="h-[18px] w-[18px]" />
+            <IconBadge name={l.item.icon ?? cat.icon} className="h-[18px] w-[18px]" />
           </span>
           <div className="min-w-0 flex-1">
-            {link ? (
+            {managed ? (
               <div className="truncate font-medium" title={l.item.label}>{l.item.label}</div>
             ) : (
               <input aria-label={`${cat.label} label`} className="ghost -ml-2 font-medium" value={l.item.label} onChange={(e) => updateItem(l.item.id, { label: e.target.value })} />
             )}
-            <div className="num truncate text-xs text-muted">{link ? `${l.item.note} · per person · ${people}` : `${cat.unitLabel} · quantity ${l.quantity}`}</div>
+            <div className="num truncate text-xs text-muted">{managed ? l.item.note : `${cat.unitLabel} · quantity ${l.quantity}`}</div>
           </div>
         </div>
-        {link ? (
+        {managed ? (
           <button
             className="icon-btn md:order-last text-sea-700" aria-label={`${l.item.label} is managed in the itinerary. Open itinerary`}
             title="Managed in the Itinerary tab. Add or remove it there." onClick={onOpenItinerary}
@@ -52,8 +53,8 @@ export function CostTable({ onOpenItinerary }: { onOpenItinerary?: () => void })
           </button>
         )}
         <div className="col-span-2 flex items-center gap-2 md:col-span-1">
-          <div className="w-36"><NumField prefix={symbol} label={link ? `${l.item.label} price` : `${cat.label} unit price`} step={10} value={l.item.unitPrice} onChange={(unitPrice) => (link ? setLinkedPrice(link, unitPrice) : updateItem(l.item.id, { unitPrice }))} /></div>
-          {!link && l.item.overridden && (
+          <div className="w-36"><NumField prefix={symbol} label={managed ? `${l.item.label} price` : `${cat.label} unit price`} step={10} value={l.item.unitPrice} onChange={(unitPrice) => (link ? setLinkedPrice(link, unitPrice) : stay ? setStayPrice(stay.id, stay.part, unitPrice) : updateItem(l.item.id, { unitPrice }))} /></div>
+          {!managed && l.item.overridden && (
             <button className="inline-flex items-center gap-1 rounded-full bg-saffron-100 px-2 py-1 text-xs font-medium text-saffron-700 hover:bg-saffron-500/30" title="You edited this price. Click to let estimates update it again." onClick={() => updateItem(l.item.id, { overridden: false })}>
               edited <RotateCcw className="h-3 w-3" />
             </button>
@@ -67,7 +68,7 @@ export function CostTable({ onOpenItinerary }: { onOpenItinerary?: () => void })
 
   const renderSection = (id: CostSection) => {
     const def = SECTIONS.find((s) => s.id === id)!;
-    const cats = CATEGORIES.filter((c) => c.section === id && !c.linked);
+    const cats = CATEGORIES.filter((c) => c.section === id && !c.linked && !c.legacy);
     const lines = summary.lines.filter((l) => getCategory(l.item.category).section === id);
     const total = round2(lines.reduce((s, l) => s + l.total, 0));
     const perPerson = people > 0 ? round2(total / people) : 0;
@@ -95,21 +96,29 @@ export function CostTable({ onOpenItinerary }: { onOpenItinerary?: () => void })
           <span>Item</span><span>{id === "daily" ? "Price per day or night" : "Price per unit"}</span><span className="text-right">Per person</span><span className="text-right">Total</span><span />
         </div>
         <ul className="divide-y divide-line">{lines.map(renderRow)}</ul>
+        {lines.length === 0 && (
+          <p className="px-4 py-5 text-sm text-muted">
+            Nothing here yet. Add places, activities and transfers (including flights) in the{" "}
+            <button className="text-sea-700 underline underline-offset-2" onClick={onOpenItinerary}>Itinerary</button>.
+          </p>
+        )}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line bg-sea-50/60 px-4 py-2.5">
-          <Plus className="h-4 w-4 text-sea-700" />
-          <select aria-label={`Add ${id} item`} className="field h-9 w-auto" value="" onChange={(e) => e.target.value && addItem(e.target.value as never)}>
-            <option value="">Add {id === "daily" ? "a daily" : "a trip"} item</option>
-            {cats.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-          </select>
-          {id === "trip" && (
-            <span className="flex items-center gap-1.5 text-xs text-muted">
+          {cats.length > 0 && (
+            <>
+              <Plus className="h-4 w-4 text-sea-700" />
+              <select aria-label={`Add ${id} item`} className="field h-9 w-auto" value="" onChange={(e) => e.target.value && addItem(e.target.value as never)}>
+                <option value="">Add {id === "daily" ? "a daily" : "a trip"} item</option>
+                {cats.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+              </select>
+            </>
+          )}
+          <span className="flex items-center gap-1.5 text-xs text-muted">
               <Lock className="h-3.5 w-3.5" />
               <span>
-                Places and activities come from the{" "}
+                {id === "daily" ? "Hotels and extra beds come from the" : "Entry fees, activities and transfers come from the"}{" "}
                 <button className="text-sea-700 underline underline-offset-2" onClick={onOpenItinerary}>Itinerary</button>.
               </span>
             </span>
-          )}
         </div>
       </div>
     );

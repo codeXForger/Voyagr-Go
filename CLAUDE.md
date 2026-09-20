@@ -1,7 +1,7 @@
 # Voyagr-Go — Trip Planner
 
 Plan a trip (destination, days/nights, people, rooms, extra beds), see an editable cost breakdown
-(flights, stay, extra bed, cab, breakfast, lunch, dinner, places, activities) with **unit price, per-person
+(breakfast, lunch, dinner, plus hotels, extra beds, entry fees, activities and transfers, which come from the itinerary; flights are a "Flight" transfer) with **unit price, per-person
 and total**, an **"if N people go"** table, export the itinerary + costs as **PDF**, and save/open trips
 as JSON on **Google Drive** (or a local file). **No database** — state lives in the browser; persistence
 is a JSON file.
@@ -47,7 +47,7 @@ src/data/          destinations.json — offline base rates (INR) + FX table; lo
   perPersonNight = people×nights · flat = 1. All multiplied by `count`.
 - `total = unitPrice × quantity`; `perPerson = total / people`. Money is rounded to 2 decimals.
 - Editing a price sets `overridden = true`; provider refreshes (`applyQuotes`) never overwrite overridden items.
-- Scenario ("if N go"): rooms = ceil(N / roomOccupancy), extra beds = 0, cabs scale by capacity.
+- Scenario ("if N go"): hotels with `rooms: null` book ceil(N / guestsPerRoom) rooms, so their cost follows N; per-person items follow N too; group-billed transfers (a cab) and hotels with an explicit room count stay as entered.
 - days/nights stay linked (nights = days − 1) via `withDays` / `withNights`; the itinerary resizes with days.
 - PDF uses currency **codes** (not symbols) because built-in PDF fonts lack glyphs such as the rupee sign.
 
@@ -84,8 +84,8 @@ Plus Jakarta Sans (body) via `next/font`. Reusable classes (`.field`, `.ghost`, 
 Don't run `next build` while `next dev` is running — it corrupts the dev cache.
 
 ## Cost sections
-Each category has a `section` in `domain/categories.ts`: **daily** (stay, extra bed, cab, breakfast, lunch, dinner —
-charged per day/night) or **trip** (flights, places, activities — paid once). The UI (`CostTable`) and the PDF
+Each category has a `section` in `domain/categories.ts`: **daily** (hotels, extra beds, breakfast, lunch, dinner —
+charged per day/night) or **trip** (entry fees, activities, transfers — paid once; flights are a "Flight" transfer; the `flight` category is `legacy`, kept so older trips open). The UI (`CostTable`) and the PDF
 (`report.costSections`) render them separately; the daily section also shows per day and per person per day.
 
 ## Itinerary lists and linked costs
@@ -121,3 +121,62 @@ get price 0 so old totals do not change.
   so "To date", Days and Nights stay in sync: store `setEndDate` sets nights from the range (start is inferred if empty,
   end-before-start is ignored, length capped at 90 nights). Helpers live in `domain/dates.ts` (UTC math, no time zones).
   The date shows on the ticket, per itinerary day, in the PDF, and live-price searches start from it when it is in the future.
+
+## Transfers and the timeline
+A place can have `transferIn: Transfer | null`: how the group gets there from the previous stop
+(`{ mode, from, cost, billing: "group"|"perPerson", people, time }`). Modes and their default billing live in
+`domain/transfers.ts` (cab/auto/walk/other: one price for the group; bus/train/ferry/flight: per person).
+`from` blank means the previous place's name (or "Start"). Transfers are derived cost lines (category `transfers`,
+trip section, `link.transfer = true`) exactly like entry fees and activities, so they are added/removed with the
+itinerary, are locked in the Costs tab, and their price can be edited from either place. Cost rows use the transfer
+mode's icon (`CostItem.icon`) and a caption built in `itineraryItems` (`CostItem.note`).
+Places, activities and transfers each have an optional `time` (HH:MM, "" = none). The Itinerary tab has Edit and
+Timeline views; `Timeline` is read-only and shows the sequence (in edit order, not sorted by time) with a per-day
+cost (`dayCost`). The PDF prints the same sequence. Cab costs are transfers (there is no daily Cab row any more). The `cab` category is `legacy`: kept only so old saved
+trips still open (it renders under Trip charges and is not offered in the Add menu); `vehicleCapacity` is likewise kept in
+the config for those files but has no UI.
+Icons: `scripts/build-icons.mjs` regenerates `domain/iconNodes.ts`; add a key there and to `IconKey` in `domain/types.ts`.
+
+## Hotels (stays)
+`Trip.stays: Stay[]` (`domain/stays.ts`). A `Stay` is `{ id, name, checkIn (day, 1-based), nights, roomPrice (per room per
+night), rooms: number|null, guestsPerRoom, extraBeds, extraBedPrice }`. You sleep at a stay on the nights of days
+`checkIn .. checkIn+nights-1` and check out on day `checkIn+nights`. Several stays follow one another for a multi-hotel trip.
+- `rooms: null` = automatic: `ceil(people / guestsPerRoom)`, so it follows the group size (and the "if N go" table).
+- Costs are derived like the other itinerary items: `stayItems` turns each stay into a room line (`category: "stay"`,
+  count = rooms x nights) and, when extra beds > 0, an extra-bed line (`category: "extraBed"`); both carry `CostItem.stay`
+  and are locked in the Costs tab (price editable there via `setStayPrice`, everything else in the itinerary). Removing a
+  stay removes its lines. Only nights inside the trip are charged (`stayNights`).
+- `TripConfig` no longer has `rooms` / `extraBeds`; `roomOccupancy` is just the default guests per room for new stays.
+  `perRoomNight` / `perExtraBedNight` pricing bases were removed. `parseTrip` migrates older files: the old stay and
+  extra-bed rows plus `config.rooms/extraBeds` become one stay covering every night.
+- UI: `StaysEditor` (night strip, one card per hotel, gaps are clickable to add a hotel), `LodgingTags` (check in / check
+  out / staying at / no hotel chips on each day), and lodging notes in `Timeline`. "Fetch estimates" fills a hotel's
+  room and extra-bed price only while it is still 0. The PDF has a "Where you stay" section.
+
+### Choosing hotels in stops and transfers
+`SuggestInput` is a text box with a suggestion dropdown (free text is always accepted; Enter only picks an option after
+Arrow keys, otherwise it falls through, e.g. to add a row). A place's name suggests your hotels (`hotelNames(stays)`),
+and a transfer's "From" suggests your hotels plus the day's other places. Matching is by name, so a stop named like a
+hotel (case-insensitive, `isHotelName`) gets the hotel icon in the list and on the timeline. Renaming a hotel does not
+rewrite names already typed into stops or transfers.
+
+### Parking
+`PlaceStop.parking` (number, default 0) is an optional charge for the whole group at that place. When it is above 0 it
+becomes a derived cost line (`category: "parking"`, `link.parking = true`, count 1, one price for the group); at 0 there
+is no line. It is locked in the Costs tab like other itinerary items, counts in `dayCost`, and prints in the PDF place detail.
+
+## PDF design
+The PDF is a branded document built by `services/export/TripDocument.tsx` from the `Report` view-model
+(`report.ts`, the only place that formats data). Colors come from `domain/colors.ts` (`BRAND`, shared with the app).
+Pages: cover band with route, dates and chips, price cards, cost split bar, hotels; then "Day by day" (timeline with
+transfers, activities and hotel notes), the cost breakdown tables, the group-size table and a disclaimer. Every page has a
+saffron accent bar and a footer with page numbers. Free (0) entry fees and activities are left out of the cost tables.
+Amounts use currency codes because the built-in PDF fonts lack the rupee sign.
+react-pdf gotchas learned the hard way (each caused an infinite layout loop or a missing element):
+- Put `break` only on **top-level** children of `<Page>` (use `<View break />` as a sibling). A `break` on an element
+  nested inside a container that then spans pages hangs the layout forever.
+- `position: absolute` with `bottom` does not work for the footer here; use `top` (A4 is 841.89pt tall).
+- Keep a day on one page with `wrap={false}` only when it is small (see the size heuristic in `Day`); a `wrap={false}`
+  block taller than a page is a risk.
+To look at the output, render `PdfExporter` in a node-environment test, write the blob to a file and rasterize it
+(for example with PyMuPDF). `timeout` does not exist on macOS, so guard long renders with your own kill.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activityPeople, itineraryItems, placePeople, withLinkedPrice } from "./itineraryCosts";
+import { activityPeople, dayCost, itineraryItems, placePeople, withLinkedPrice } from "./itineraryCosts";
 import { scenarioTable, summarize } from "./pricing";
 import { createTrip, DEFAULT_ACTIVITY_PRICE, newActivity, newPlace } from "./trip";
 import type { Trip } from "./types";
@@ -75,5 +75,41 @@ describe("itinerary-derived costs", () => {
     expect(it2[0].places[0].activities[0].price).toBe(900);
     expect(withLinkedPrice(it2, { day: 1, place: 0 }, -5)[0].places[0].fee).toBe(0);
     expect(t.itinerary[0].places[0].fee).toBe(0); // original untouched
+  });
+});
+
+describe("parking charges", () => {
+  it("defaults to 0 and adds no cost line until a price is entered", () => {
+    expect(newPlace().parking).toBe(0);
+    const t = tripWith([{ ...newPlace(), name: "Fort", fee: 100 }]);
+    expect(itineraryItems(t.itinerary, t.config).some((i) => i.category === "parking")).toBe(false);
+    expect(summarize(t).categoryTotals.parking).toBeUndefined();
+  });
+
+  it("adds one group price per place, tied to that place", () => {
+    const t = tripWith([{ ...newPlace(), name: "Fort", fee: 100, parking: 150 }, { ...newPlace(), name: "Beach", parking: 50 }]);
+    const lines = summarize(t).lines.filter((l) => l.item.category === "parking");
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toMatchObject({ quantity: 1, total: 150 }); // not multiplied by the 4 people
+    expect(lines[0].item).toMatchObject({ label: "Fort parking", link: { day: 1, place: 0, parking: true } });
+    expect(lines[0].item.note).toBe("Day 1 · one price for the group");
+    expect(summarize(t).categoryTotals.parking).toBe(200);
+  });
+
+  it("goes away when set back to 0 or when the place is removed, and counts in the day's cost", () => {
+    const t = tripWith([{ ...newPlace(), name: "Fort", fee: 100, parking: 150 }]);
+    expect(dayCost(t.itinerary, t.config, 1)).toBe(400 + 150);
+    t.itinerary[0].places[0].parking = 0;
+    expect(summarize(t).categoryTotals.parking).toBeUndefined();
+    t.itinerary[0].places[0].parking = 150;
+    t.itinerary[0].places = [];
+    expect(summarize(t).categoryTotals.parking).toBeUndefined();
+  });
+
+  it("edits the parking price through its link without touching the entry fee", () => {
+    const t = tripWith([{ ...newPlace(), name: "Fort", fee: 100, parking: 150 }]);
+    const next = withLinkedPrice(t.itinerary, { day: 1, place: 0, parking: true }, 220);
+    expect(next[0].places[0]).toMatchObject({ parking: 220, fee: 100 });
+    expect(withLinkedPrice(t.itinerary, { day: 1, place: 0, parking: true }, -1)[0].places[0].parking).toBe(0);
   });
 });

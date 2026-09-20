@@ -1,3 +1,7 @@
+export type IconKey =
+  | "plane" | "hotel" | "bed" | "car" | "coffee" | "utensils" | "moon" | "landmark" | "ticket"
+  | "ship" | "bus" | "train" | "walk" | "route" | "bike" | "clock" | "parking";
+
 export type CategoryId =
   | "flight"
   | "stay"
@@ -7,13 +11,13 @@ export type CategoryId =
   | "lunch"
   | "dinner"
   | "places"
-  | "activities";
+  | "activities"
+  | "transfers"
+  | "parking";
 
 /** How an item's quantity is derived from the trip configuration. */
 export type PricingBasis =
   | "perPerson"
-  | "perRoomNight"
-  | "perExtraBedNight"
   | "perVehicleDay"
   | "perPersonDay"
   | "perPersonNight"
@@ -28,9 +32,7 @@ export interface TripConfig {
   days: number;
   nights: number;
   people: number;
-  rooms: number;
-  extraBeds: number;
-  /** Guests a room holds before an extra bed is needed (used by scenarios). */
+  /** Default guests per room for new hotel stays (each stay can change it). */
   roomOccupancy: number;
   /** Passengers one cab carries (used to scale cab cost with group size). */
   vehicleCapacity: number;
@@ -40,8 +42,12 @@ export interface TripConfig {
 export interface ItemLink {
   day: number;
   place: number;
-  /** Absent for the place's own entry fee. */
+  /** Set for an activity at that place. */
   activity?: number;
+  /** True for the transfer used to reach that place. */
+  transfer?: boolean;
+  /** True for the place's parking charge. With none of `activity`, `transfer` or `parking`, it is the entry fee. */
+  parking?: boolean;
 }
 
 export interface CostItem {
@@ -57,12 +63,52 @@ export interface CostItem {
   overridden: boolean;
   /** Set only on lines derived from the itinerary (never stored); they are managed there. */
   link?: ItemLink;
-  /** Extra context for derived lines, e.g. "Day 1 · at Fort Aguada". */
+  /** Extra context for derived lines, e.g. "Day 1 · at Fort Aguada · per person · 4 people". */
   note?: string;
+  /** Icon override for derived lines (e.g. the transfer mode). */
+  icon?: IconKey;
+  /** Set on lines derived from a hotel stay; they are managed in the itinerary. */
+  stay?: { id: string; part: "room" | "bed" };
+}
+
+/** A hotel and the run of nights spent there. A trip can have several, one after another. */
+export interface Stay {
+  id: string;
+  name: string;
+  /** Day you check in (1-based). You sleep there the night of this day. */
+  checkIn: number;
+  /** Number of nights. You check out on day `checkIn + nights`. */
+  nights: number;
+  /** Price per room per night. */
+  roomPrice: number;
+  /** Rooms booked; null means as many as needed for everyone (people / guestsPerRoom, rounded up). */
+  rooms: number | null;
+  guestsPerRoom: number;
+  extraBeds: number;
+  /** Price per extra bed per night. */
+  extraBedPrice: number;
+}
+
+export type TransferMode = "cab" | "auto" | "bus" | "train" | "ferry" | "flight" | "walk" | "other";
+
+/** How the group gets to a place from the previous stop, with its cost. */
+export interface Transfer {
+  mode: TransferMode;
+  /** Where it starts. Blank means the previous place in the day. */
+  from: string;
+  cost: number;
+  /** "group": one price for everyone (a cab). "perPerson": each traveler pays (a ferry ticket). */
+  billing: "group" | "perPerson";
+  /** People traveling when billed per person; null means everyone on the trip. */
+  people: number | null;
+  /** Optional departure time, HH:MM. */
+  time: string;
 }
 
 export interface ActivityStop {
   name: string;
+  /** Optional start time, HH:MM. */
+  time?: string;
   /** Number of people doing it; null means "everyone going to this place". */
   people: number | null;
   /** Price per person. */
@@ -72,10 +118,16 @@ export interface ActivityStop {
 /** A place to visit; the activities to do there are its children. */
 export interface PlaceStop {
   name: string;
+  /** Optional arrival time, HH:MM. */
+  time?: string;
+  /** How you get here from the previous stop. */
+  transferIn?: Transfer | null;
   /** Number of people visiting; null means "everyone on the trip". */
   people: number | null;
   /** Entry fee per person. */
   fee: number;
+  /** Optional parking charge for the whole group at this place (0 = none). */
+  parking?: number;
   activities: ActivityStop[];
 }
 
@@ -92,6 +144,7 @@ export interface Trip {
   config: TripConfig;
   items: CostItem[];
   itinerary: DayPlan[];
+  stays: Stay[];
 }
 
 export interface LineCost {

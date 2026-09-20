@@ -7,13 +7,11 @@ import type { CostItem } from "./types";
 const item = (over: Partial<CostItem>): CostItem => ({
   id: "x", category: "flight", label: "x", unitPrice: 100, basis: "perPerson", count: 1, overridden: false, ...over,
 });
-const cfg = { ...createTrip().config, people: 4, rooms: 2, extraBeds: 1, days: 5, nights: 4 };
+const cfg = { ...createTrip().config, people: 4, days: 5, nights: 4 };
 
 describe("pricing strategies", () => {
   it.each([
     ["perPerson", 4],
-    ["perRoomNight", 8],
-    ["perExtraBedNight", 4],
     ["perVehicleDay", 5],
     ["perPersonDay", 20],
     ["perPersonNight", 16],
@@ -31,9 +29,9 @@ describe("pricing strategies", () => {
     expect(lineCost(cfg, item({ count: 3 })).total).toBe(1200);
   });
 
-  it("handles zero rooms and negative prices safely", () => {
-    const l = lineCost({ ...cfg, rooms: 0 }, item({ basis: "perRoomNight", unitPrice: -5 }));
-    expect(l.total).toBe(0);
+  it("handles zero counts and negative prices safely", () => {
+    expect(lineCost(cfg, item({ basis: "flat", unitPrice: -5 })).total).toBe(0);
+    expect(lineCost(cfg, item({ count: 0 })).total).toBe(0);
   });
 
   it("supports registering a new strategy (open/closed)", () => {
@@ -45,7 +43,7 @@ describe("pricing strategies", () => {
 
 describe("summarize", () => {
   it("computes unit, per-person, total and category totals", () => {
-    const trip = { config: cfg, items: [item({ unitPrice: 100 }), item({ id: "y", category: "stay", basis: "perRoomNight", unitPrice: 50 })] };
+    const trip = { config: cfg, items: [item({ unitPrice: 100 }), item({ id: "y", category: "stay", basis: "perPerson", unitPrice: 100 })] };
     const s = summarize(trip);
     expect(s.lines[0]).toMatchObject({ unitPrice: 100, total: 400, perPerson: 100 });
     expect(s.categoryTotals).toEqual({ flight: 400, stay: 400 });
@@ -64,10 +62,9 @@ describe("scenarioTable", () => {
   it("returns a row per group size with rooms scaled and cab shared", () => {
     const trip = {
       config: { ...cfg, people: 2, days: 2, nights: 1 },
-      items: [
-        item({ basis: "perVehicleDay", unitPrice: 1000 }),
-        item({ id: "s", category: "stay", basis: "perRoomNight", unitPrice: 500 }),
-      ],
+      items: [item({ basis: "perVehicleDay", unitPrice: 1000 })],
+      // One hotel for the single night, rooms set to "as many as needed" so it scales with the group.
+      stays: [{ id: "h", name: "Hotel", checkIn: 1, nights: 1, roomPrice: 500, rooms: null, guestsPerRoom: 2, extraBeds: 0, extraBedPrice: 0 }],
     };
     const rows = scenarioTable(trip, 5);
     expect(rows).toHaveLength(5);
@@ -86,7 +83,7 @@ describe("trip helpers", () => {
 
   it("creates one default item per category and itinerary per day", () => {
     const t = createTrip({ destination: "Goa", days: 3, nights: 2 });
-    expect(t.items).toHaveLength(7); // places and activities come from the itinerary
+    expect(t.items).toHaveLength(3); // hotels, places, activities, transfers (and flights) come from the itinerary
     expect(t.itinerary).toHaveLength(3);
     expect(t.name).toBe("Trip to Goa");
   });

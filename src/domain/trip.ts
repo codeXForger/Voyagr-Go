@@ -3,8 +3,8 @@ import type { ActivityStop, CostItem, DayPlan, PlaceStop, Trip, TripConfig } fro
 
 export const DEFAULT_ACTIVITY_PRICE = 500;
 
-export const newPlace = (): PlaceStop => ({ name: "", people: null, fee: 0, activities: [] });
-export const newActivity = (): ActivityStop => ({ name: "", people: null, price: DEFAULT_ACTIVITY_PRICE });
+export const newPlace = (): PlaceStop => ({ name: "", time: "", transferIn: null, people: null, fee: 0, parking: 0, activities: [] });
+export const newActivity = (): ActivityStop => ({ name: "", time: "", people: null, price: DEFAULT_ACTIVITY_PRICE });
 
 let seq = 0;
 export const newId = (prefix = "id") =>
@@ -18,8 +18,6 @@ export const defaultConfig = (): TripConfig => ({
   days: 4,
   nights: 3,
   people: 2,
-  rooms: 1,
-  extraBeds: 0,
   roomOccupancy: 2,
   vehicleCapacity: 4,
 });
@@ -31,7 +29,7 @@ export const buildItinerary = (days: number, previous: DayPlan[] = []): DayPlan[
   });
 
 export const defaultItems = (): CostItem[] =>
-  CATEGORIES.filter((c) => !c.linked).map((c) => ({
+  CATEGORIES.filter((c) => !c.linked && !c.legacy).map((c) => ({
     id: newId(c.id),
     category: c.id,
     label: c.defaultLabel,
@@ -49,6 +47,7 @@ export function createTrip(overrides: Partial<TripConfig> = {}): Trip {
     config,
     items: defaultItems(),
     itinerary: buildItinerary(config.days),
+    stays: [],
   };
 }
 

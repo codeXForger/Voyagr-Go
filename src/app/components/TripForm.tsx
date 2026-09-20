@@ -65,15 +65,13 @@ export function TripForm() {
 
       <Group title="Who is coming?">
         <Row label="People"><NumField stepper label="People" min={1} value={c.people} onChange={(people) => setConfig({ people })} /></Row>
-        <Row label="Rooms"><NumField stepper label="Rooms" min={1} value={c.rooms} onChange={(rooms) => setConfig({ rooms })} /></Row>
-        <Row label="Extra beds"><NumField stepper label="Extra beds" value={c.extraBeds} onChange={(extraBeds) => setConfig({ extraBeds })} /></Row>
+        <p className="text-xs text-muted">Rooms and extra beds are set for each hotel in the Itinerary tab.</p>
       </Group>
 
       <details className="group border-t border-line pt-4">
-        <summary className="cursor-pointer font-display text-base font-semibold marker:text-muted">Room and cab limits</summary>
+        <summary className="cursor-pointer font-display text-base font-semibold marker:text-muted">Hotel defaults</summary>
         <div className="mt-3 flex flex-col gap-3">
-          <Row label="Guests per room" hint="Used for group-size table"><NumField stepper label="Guests per room" min={1} value={c.roomOccupancy} onChange={(roomOccupancy) => setConfig({ roomOccupancy })} /></Row>
-          <Row label="Seats per cab" hint="More cabs as the group grows"><NumField stepper label="Cab capacity" min={1} value={c.vehicleCapacity} onChange={(vehicleCapacity) => setConfig({ vehicleCapacity })} /></Row>
+          <Row label="People per room" hint="Starting value for new hotels"><NumField stepper label="Guests per room" min={1} value={c.roomOccupancy} onChange={(roomOccupancy) => setConfig({ roomOccupancy })} /></Row>
         </div>
       </details>
     </section>

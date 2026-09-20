@@ -3,7 +3,8 @@ import { buildItinerary, createTrip, newId, withDays, withNights } from "@/domai
 import { getCategory } from "@/domain/categories";
 import { addDays, diffDays, isIsoDate } from "@/domain/dates";
 import { withLinkedPrice } from "@/domain/itineraryCosts";
-import type { CategoryId, CostItem, DayPlan, ItemLink, Trip, TripConfig } from "@/domain/types";
+import { newStay, normalizeStay } from "@/domain/stays";
+import type { CategoryId, CostItem, DayPlan, ItemLink, Stay, Trip, TripConfig } from "@/domain/types";
 import type { PriceClient } from "@/services/pricing/PriceClient";
 import type { PriceQuote } from "@/services/pricing/PriceProvider";
 
@@ -25,6 +26,12 @@ export interface TripState {
   removeItem(id: string): void;
   /** Changes the price of a cost line that is owned by an itinerary place or activity. */
   setLinkedPrice(link: ItemLink, price: number): void;
+  /** Adds a hotel in the first run of nights that has none, and returns its id. */
+  addStay(range?: { checkIn: number; nights: number }): string;
+  updateStay(id: string, patch: Partial<Omit<Stay, "id">>): void;
+  removeStay(id: string): void;
+  /** Changes the room or extra-bed price of a hotel from the Costs tab. */
+  setStayPrice(id: string, part: "room" | "bed", price: number): void;
   updateDay(day: number, patch: Partial<DayPlan>): void;
   applyQuotes(quotes: PriceQuote[]): void;
   refreshPrices(client: PriceClient): Promise<void>;
@@ -44,8 +51,6 @@ export const createTripStore = (initial: Trip = createTrip()) =>
       set((s) => {
         const c = { ...s.trip.config, ...patch };
         c.people = clampInt(c.people, 1);
-        c.rooms = clampInt(c.rooms, 1);
-        c.extraBeds = clampInt(c.extraBeds, 0);
         c.roomOccupancy = clampInt(c.roomOccupancy, 1);
         c.vehicleCapacity = clampInt(c.vehicleCapacity, 1);
         return { trip: { ...s.trip, config: c } };
@@ -110,6 +115,28 @@ export const createTripStore = (initial: Trip = createTrip()) =>
     setLinkedPrice: (link, price) =>
       set((s) => ({ trip: { ...s.trip, itinerary: withLinkedPrice(s.trip.itinerary, link, price) } })),
 
+    addStay: (range) => {
+      const base = newStay(get().trip.stays, get().trip.config);
+      const stay = range ? normalizeStay({ ...base, ...range }, get().trip.config) : base;
+      set((s) => ({ trip: { ...s.trip, stays: [...s.trip.stays, stay] } }));
+      return stay.id;
+    },
+
+    updateStay: (id, patch) =>
+      set((s) => ({
+        trip: {
+          ...s.trip,
+          stays: s.trip.stays
+            .map((x) => (x.id === id ? normalizeStay({ ...x, ...patch }, s.trip.config) : x))
+            .sort((a, b) => a.checkIn - b.checkIn),
+        },
+      })),
+
+    removeStay: (id) => set((s) => ({ trip: { ...s.trip, stays: s.trip.stays.filter((x) => x.id !== id) } })),
+
+    setStayPrice: (id, part, price) =>
+      get().updateStay(id, part === "room" ? { roomPrice: price } : { extraBedPrice: price }),
+
     updateDay: (day, patch) =>
       set((s) => ({
         trip: { ...s.trip, itinerary: s.trip.itinerary.map((d) => (d.day === day ? { ...d, ...patch } : d)) },
@@ -118,9 +145,16 @@ export const createTripStore = (initial: Trip = createTrip()) =>
     applyQuotes: (quotes) =>
       set((s) => {
         const byCategory = new Map(quotes.map((q) => [q.category, q.unitPrice]));
+        // Hotels only get an estimate where the price is still empty, so prices you typed are never replaced.
+        const stays = s.trip.stays.map((h) => ({
+          ...h,
+          roomPrice: h.roomPrice === 0 ? (byCategory.get("stay") ?? 0) : h.roomPrice,
+          extraBedPrice: h.extraBedPrice === 0 ? (byCategory.get("extraBed") ?? 0) : h.extraBedPrice,
+        }));
         return {
           trip: {
             ...s.trip,
+            stays,
             items: s.trip.items.map((i) =>
               !i.overridden && byCategory.has(i.category) ? { ...i, unitPrice: byCategory.get(i.category)! } : i,
             ),

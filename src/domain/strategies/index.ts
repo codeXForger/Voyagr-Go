@@ -24,8 +24,6 @@ const define = (basis: PricingBasis, fn: (c: TripConfig) => number) =>
   registerStrategy(basis, { quantity: (c, i) => nonNeg(fn(c)) * nonNeg(i.count) });
 
 define("perPerson", (c) => c.people);
-define("perRoomNight", (c) => c.rooms * c.nights);
-define("perExtraBedNight", (c) => c.extraBeds * c.nights);
 define("perVehicleDay", (c) => Math.ceil(c.people / Math.max(1, c.vehicleCapacity)) * c.days);
 define("perPersonDay", (c) => c.people * c.days);
 define("perPersonNight", (c) => c.people * c.nights);
